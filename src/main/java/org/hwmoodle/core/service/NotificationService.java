@@ -4,6 +4,7 @@ import org.hwmoodle.core.dto.UserNotificationEvent;
 import org.hwmoodle.core.model.NotificationEntity;
 import org.hwmoodle.core.repository.NotificationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificationService {
@@ -19,6 +20,7 @@ public class NotificationService {
         this.emailNotificationService = emailNotificationService;
     }
 
+    @Transactional
     public void handleNotification(UserNotificationEvent event) {
         String subject = templateResolver.resolveSubject(event.operation());
         String body = templateResolver.resolveBody(event.operation());
@@ -27,4 +29,3 @@ public class NotificationService {
         emailNotificationService.sendNotification(event, subject, body);
     }
 }
-

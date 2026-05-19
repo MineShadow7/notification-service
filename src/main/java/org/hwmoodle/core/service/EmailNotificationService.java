@@ -20,12 +20,6 @@ public class EmailNotificationService {
         this.templateResolver = templateResolver;
     }
 
-    public void sendNotification(UserNotificationEvent event) {
-        String subject = templateResolver.resolveSubject(event.operation());
-        String body = templateResolver.resolveBody(event.operation());
-        sendNotification(event, subject, body);
-    }
-
     public void sendNotification(UserNotificationEvent event, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(notificationProperties.senderEmail());
