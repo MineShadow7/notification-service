@@ -1,7 +1,11 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
+  application:
+    name: notification-service
+  config:
+    import: optional:configserver:http://localhost:8888
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
@@ -38,7 +42,47 @@ spring:
       ddl-auto: update
     open-in-view: false
 
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
 app:
   notification:
     sender-email: ${APP_NOTIFICATION_SENDER_EMAIL:}
     topic: user-events
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      emailServiceCB:
+        register-health-indicator: true
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        slow-call-rate-threshold: 100
+        slow-call-duration-threshold: 2000
+  timelimiter:
+    instances:
+      emailServiceCB:
+        cancel-running-future: true
+        timeout-duration: 5000
+
